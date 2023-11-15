@@ -55,7 +55,7 @@ StartDialog=Yes
 FinishDialog=Yes
 
 [SPLASH_WINDOW]
-Bitmap_Pathname=E:\vb6\Magnifier-VB6\Resources\images\Splash.bmp
+Bitmap_Pathname=E:\vb6\Magnifier-VB6-Widget\Resources\images\Splash.bmp
 Bitmap_Duration=2
 
 [SETUP_WINDOW]
@@ -95,7 +95,7 @@ Show_ViewReadme_Checked=Yes
 Show_RunApplication_CheckBox=Yes
 Show_RunApplication_Checked=Yes
 Readme_Pathname=
-Application_Pathname=%AppDir%\earth.exe
+Application_Pathname=%AppDir%\Magnifier.exe
 
 [EXTERNAL_TOOLS]
 RunBeforeInstall=No
@@ -110,7 +110,7 @@ BeforeUninstall=,,,1,2,1,
 [CREATE_SETUP]
 OutputFolder=E:\vb6\MagnifierVB6 ver. 1.0.0
 SetupFilename=Setup.exe
-SetupIconPathname=E:\vb6\Magnifier-VB6\Resources\images\32x32x16.ico
+SetupIconPathname=E:\vb6\Magnifier-VB6-Widget\Resources\images\32x32x16.ico
 CreateSelfExtractedSetup=Yes
 CreatePasswordProtectedSetup=No
 Password=
@@ -275,6 +275,7 @@ File=%AppDir%\CCRSlider.ocx,.\CCRSlider.ocx,17,2,128
 File=%AppDir%\GPL LICENCE.TXT,.\GPL LICENCE.TXT,17,0,128
 File=%AppDir%\prefs.bat,.\prefs.bat,17,0,128
 File=%AppDir%\Magnifier.exe,.\Magnifier.exe,17,2,128
+File=%AppDir%\unhide.bat,.\unhide.bat,17,0,128
 
 [SHORTCUTS]
 
