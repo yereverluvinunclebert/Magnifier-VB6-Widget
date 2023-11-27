@@ -283,7 +283,6 @@ Private Const VER_PLATFORM_WIN32_NT = 2
 ' general
 Public gblPlStartup As String
 Public gblPlGaugeFunctions As String
-Public gblPlanetSelection As String
 'Public 'PrWidgetSkew As String
 
 ' config
@@ -394,8 +393,8 @@ Private Declare Function PathFileExists Lib "shlwapi" Alias "PathFileExistsA" (B
 Private Declare Function PathIsDirectory Lib "shlwapi" Alias "PathIsDirectoryA" (ByVal pszPath As String) As Long
 '------------------------------------------------------ ENDS
                             
-Public softwarePlanet As String
-Public thisPlanet As String
+Public softwareMagnifier As String
+Public thisMagnifier As String
      
 '---------------------------------------------------------------------------------------
 ' Procedure : fFExists
@@ -621,7 +620,7 @@ Public Sub checkLicenceState()
     
     ' read the tool's own settings file
     If fFExists(gblPlSettingsFile) Then ' does the tool's own settings.ini exist?
-        slicence = fGetINISetting(softwarePlanet, "Licence", gblPlSettingsFile)
+        slicence = fGetINISetting(softwareMagnifier, "Licence", gblPlSettingsFile)
         ' if the licence state is not already accepted then display the licence form
         If slicence = "0" Then
             Call LoadFileToTB(frmLicence.txtLicenceTextBox, App.Path & "\Resources\txt\licence.txt", False)
@@ -1530,10 +1529,10 @@ Public Sub setMainTooltips()
    On Error GoTo setMainTooltips_Error
 
     If gblPlEnableTooltips = "1" Then
-        'planetWidget.Widget.FontName = gblPlPrefsFont ' does not apply to the tooltip
-        planetWidget.Widget.ToolTip = "Use CTRL+mouse scrollwheel up/down to resize."
+        'magnifierWidget.Widget.FontName = gblPlPrefsFont ' does not apply to the tooltip
+        magnifierWidget.Widget.ToolTip = "Use CTRL+mouse scrollwheel up/down to resize."
     Else
-        planetWidget.Widget.ToolTip = ""
+        magnifierWidget.Widget.ToolTip = ""
     End If
     
     Call ChangeToolTipWidgetDefaultSettings(Cairo.ToolTipWidget.Widget)
@@ -1585,12 +1584,12 @@ Public Sub makeVisibleFormElements()
 
     'NOTE that when you position a widget you are positioning the form it is drawn upon.
 
-    fMain.planetForm.Left = Val(fGetINISetting(softwarePlanet, "maximiseFormX", gblPlSettingsFile)) ' / screenPixelsPerPixelX
-    fMain.planetForm.Top = Val(fGetINISetting(softwarePlanet, "maximiseFormY", gblPlSettingsFile)) ' / screenPixelsPerPixelY
+    fMain.magnifierForm.Left = Val(fGetINISetting(softwareMagnifier, "maximiseFormX", gblPlSettingsFile)) ' / screenPixelsPerPixelX
+    fMain.magnifierForm.Top = Val(fGetINISetting(softwareMagnifier, "maximiseFormY", gblPlSettingsFile)) ' / screenPixelsPerPixelY
 
     ' The RC forms are measured in pixels, do remember that...
 
-    fMain.planetForm.show
+    fMain.magnifierForm.show
 
     On Error GoTo 0
     Exit Sub
@@ -1788,47 +1787,47 @@ Public Sub mainScreen()
     If aspectRatio = "landscape" Then
         If gblPlWidgetLandscape = "1" Then
             If gblPlLandscapeFormHoffset <> vbNullString Then
-                fMain.planetForm.Left = Val(gblPlLandscapeFormHoffset)
-                fMain.planetForm.Top = Val(gblPlLandscapeFormVoffset)
+                fMain.magnifierForm.Left = Val(gblPlLandscapeFormHoffset)
+                fMain.magnifierForm.Top = Val(gblPlLandscapeFormVoffset)
             End If
         End If
         If gblPlAspectHidden = "2" Then
             'Print "Hiding the widget for landscape mode"
-            planetWidget.opacity = 0
+            magnifierWidget.opacity = 0
         End If
     End If
     
     ' check if the widget has a lock for the screen type.
     If aspectRatio = "portrait" Then
         If gblPlWidgetPortrait = "1" Then
-            fMain.planetForm.Left = Val(gblPlPortraitHoffset)
-            fMain.planetForm.Top = Val(gblPlPortraitYoffset)
+            fMain.magnifierForm.Left = Val(gblPlPortraitHoffset)
+            fMain.magnifierForm.Top = Val(gblPlPortraitYoffset)
         End If
         If gblPlAspectHidden = "1" Then
             'Print "Hiding the widget for portrait mode"
-            planetWidget.opacity = 0
+            magnifierWidget.opacity = 0
         End If
     End If
 
     ' calculate the on screen widget position
-    If fMain.planetForm.Left < 0 Then
-        fMain.planetForm.Left = 10
+    If fMain.magnifierForm.Left < 0 Then
+        fMain.magnifierForm.Left = 10
     End If
-    If fMain.planetForm.Top < 0 Then
-        fMain.planetForm.Top = 0
+    If fMain.magnifierForm.Top < 0 Then
+        fMain.magnifierForm.Top = 0
     End If
-    If fMain.planetForm.Left > screenWidthPixels - 50 Then
-        fMain.planetForm.Left = screenWidthPixels - 150
+    If fMain.magnifierForm.Left > screenWidthPixels - 50 Then
+        fMain.magnifierForm.Left = screenWidthPixels - 150
     End If
-    If fMain.planetForm.Top > screenHeightPixels - 50 Then
-        fMain.planetForm.Top = screenHeightPixels - 150
+    If fMain.magnifierForm.Top > screenHeightPixels - 50 Then
+        fMain.magnifierForm.Top = screenHeightPixels - 150
     End If
 
     ' calculate the current hlocation in % of the screen
     ' store the current hlocation in % of the screen
     If gblPlWidgetPosition = "1" Then
-        gblPlhLocationPercPrefValue = Str$(fMain.planetForm.Left / screenWidthPixels * 100)
-        gblPlvLocationPercPrefValue = Str$(fMain.planetForm.Top / screenHeightPixels * 100)
+        gblPlhLocationPercPrefValue = Str$(fMain.magnifierForm.Left / screenWidthPixels * 100)
+        gblPlvLocationPercPrefValue = Str$(fMain.magnifierForm.Top / screenHeightPixels * 100)
     End If
 
    On Error GoTo 0
@@ -1842,21 +1841,21 @@ End Sub
 
 
 '---------------------------------------------------------------------------------------
-' Procedure : planetForm_Unload
+' Procedure : magnifierForm_Unload
 ' Author    : beededea
 ' Date      : 18/08/2022
 ' Purpose   : the standard form unload routine
 '---------------------------------------------------------------------------------------
 '
-Public Sub planetForm_Unload() ' name follows VB6 standard naming convention
+Public Sub magnifierForm_Unload() ' name follows VB6 standard naming convention
     
     On Error GoTo Form_Unload_Error
     
-    gblPlMaximiseFormX = Str$(fMain.planetForm.Left) ' saving in pixels
-    gblPlMaximiseFormY = Str$(fMain.planetForm.Top)
+    gblPlMaximiseFormX = Str$(fMain.magnifierForm.Left) ' saving in pixels
+    gblPlMaximiseFormY = Str$(fMain.magnifierForm.Top)
     
-    sPutINISetting softwarePlanet, "maximiseFormX", gblPlMaximiseFormX, gblPlSettingsFile
-    sPutINISetting softwarePlanet, "maximiseFormY", gblPlMaximiseFormY, gblPlSettingsFile
+    sPutINISetting softwareMagnifier, "maximiseFormX", gblPlMaximiseFormX, gblPlSettingsFile
+    sPutINISetting softwareMagnifier, "maximiseFormY", gblPlMaximiseFormY, gblPlSettingsFile
     
     Call unloadAllForms(True)
 
@@ -1887,25 +1886,25 @@ Public Sub unloadAllForms(ByVal endItAll As Boolean)
     'unload the RC5 widgets on the RC5 forms first
     
     aboutWidget.Widgets.RemoveAll
-    planetWidget.Widgets.RemoveAll
+    magnifierWidget.Widgets.RemoveAll
     
     ' unload the native VB6 and RC5 forms
     
-    Unload planetPrefs
+    Unload magnifierPrefs
     Unload helpForm
     Unload frmLicence
     Unload frmTimer
     Unload menuForm
 
     fMain.aboutForm.Unload  ' RC5's own method for killing forms
-    fMain.planetForm.Unload
+    fMain.magnifierForm.Unload
     
     ' remove all variable references to each form in turn
     
-    Set planetPrefs = Nothing
+    Set magnifierPrefs = Nothing
     Set helpForm = Nothing
     Set fMain.aboutForm = Nothing
-    Set fMain.planetForm = Nothing
+    Set fMain.magnifierForm = Nothing
     Set frmLicence = Nothing
     Set frmTimer = Nothing
     Set menuForm = Nothing
@@ -1962,29 +1961,29 @@ End Sub
 Public Sub makeProgramPreferencesAvailable()
     On Error GoTo makeProgramPreferencesAvailable_Error
     
-    If planetPrefs.IsVisible = False Then
+    If magnifierPrefs.IsVisible = False Then
     
-        If planetPrefs.WindowState = vbMinimized Then
-            planetPrefs.WindowState = vbNormal
+        If magnifierPrefs.WindowState = vbMinimized Then
+            magnifierPrefs.WindowState = vbNormal
             'Call readPrefsPosition
         End If
                 ' set the current position of the utility according to previously stored positions
 
-        If planetPrefs.WindowState = vbNormal Then
+        If magnifierPrefs.WindowState = vbNormal Then
         
             Call readPrefsPosition
             
-            If planetPrefs.Left = 0 Then
-                If ((fMain.planetForm.Left + fMain.planetForm.Width) * screenTwipsPerPixelX) + 200 + planetPrefs.Width > screenWidthTwips Then
-                    planetPrefs.Left = (fMain.planetForm.Left * screenTwipsPerPixelX) - (planetPrefs.Width + 200)
+            If magnifierPrefs.Left = 0 Then
+                If ((fMain.magnifierForm.Left + fMain.magnifierForm.Width) * screenTwipsPerPixelX) + 200 + magnifierPrefs.Width > screenWidthTwips Then
+                    magnifierPrefs.Left = (fMain.magnifierForm.Left * screenTwipsPerPixelX) - (magnifierPrefs.Width + 200)
                 End If
             End If
             
-            If planetPrefs.Left < 0 Then planetPrefs.Left = 0
-            If planetPrefs.Top < 0 Then planetPrefs.Top = 0
+            If magnifierPrefs.Left < 0 Then magnifierPrefs.Left = 0
+            If magnifierPrefs.Top < 0 Then magnifierPrefs.Top = 0
             
-            planetPrefs.show  ' show it again
-            planetPrefs.SetFocus
+            magnifierPrefs.show  ' show it again
+            magnifierPrefs.SetFocus
         End If
     End If
     
@@ -2009,20 +2008,20 @@ Public Sub readPrefsPosition()
             
    On Error GoTo readPrefsPosition_Error
 
-    gblPlFormXPosTwips = fGetINISetting(softwarePlanet, "formXPos", gblPlSettingsFile)
-    gblPlFormYPosTwips = fGetINISetting(softwarePlanet, "formYPos", gblPlSettingsFile)
+    gblPlFormXPosTwips = fGetINISetting(softwareMagnifier, "formXPos", gblPlSettingsFile)
+    gblPlFormYPosTwips = fGetINISetting(softwareMagnifier, "formYPos", gblPlSettingsFile)
 
     ' if a current location not stored then position to the middle of the screen
     If gblPlFormXPosTwips <> "" Then
-        planetPrefs.Left = Val(gblPlFormXPosTwips)
+        magnifierPrefs.Left = Val(gblPlFormXPosTwips)
     Else
-        planetPrefs.Left = screenWidthTwips / 2 - planetPrefs.Width / 2
+        magnifierPrefs.Left = screenWidthTwips / 2 - magnifierPrefs.Width / 2
     End If
 
     If gblPlFormYPosTwips <> "" Then
-        planetPrefs.Top = Val(gblPlFormYPosTwips)
+        magnifierPrefs.Top = Val(gblPlFormYPosTwips)
     Else
-        planetPrefs.Top = Screen.Height / 2 - planetPrefs.Height / 2
+        magnifierPrefs.Top = Screen.Height / 2 - magnifierPrefs.Height / 2
     End If
 
    On Error GoTo 0
@@ -2043,13 +2042,13 @@ Public Sub writePrefsPosition()
         
    On Error GoTo writePrefsPosition_Error
 
-    If planetPrefs.WindowState = vbNormal Then ' when vbMinimised the value = -48000  !
-        gblPlFormXPosTwips = LTrim$(Str$(planetPrefs.Left))
-        gblPlFormYPosTwips = LTrim$(Str$(planetPrefs.Top))
+    If magnifierPrefs.WindowState = vbNormal Then ' when vbMinimised the value = -48000  !
+        gblPlFormXPosTwips = LTrim$(Str$(magnifierPrefs.Left))
+        gblPlFormYPosTwips = LTrim$(Str$(magnifierPrefs.Top))
         
         ' now write those params to the toolSettings.ini
-        sPutINISetting softwarePlanet, "formXPos", gblPlFormXPosTwips, gblPlSettingsFile
-        sPutINISetting softwarePlanet, "formYPos", gblPlFormYPosTwips, gblPlSettingsFile
+        sPutINISetting softwareMagnifier, "formXPos", gblPlFormXPosTwips, gblPlSettingsFile
+        sPutINISetting softwareMagnifier, "formYPos", gblPlFormYPosTwips, gblPlSettingsFile
     End If
     
     On Error GoTo 0
@@ -2057,7 +2056,7 @@ Public Sub writePrefsPosition()
 
 writePrefsPosition_Error:
 
-    MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure writePrefsPosition of Form planetPrefs"
+    MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure writePrefsPosition of Form magnifierPrefs"
 End Sub
 
 

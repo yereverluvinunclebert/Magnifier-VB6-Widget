@@ -24,7 +24,7 @@ Private Const OnTopFlags  As Long = SWP_NOMOVE Or SWP_NOSIZE
 Public fMain As New cfMain
 Public revealWidgetTimerCount As Integer
 
-Public planetWidget As cwPlanet
+Public magnifierWidget As cwMagnifier
 Public aboutWidget As cwAbout
 
 
@@ -49,11 +49,11 @@ Public aboutWidget As cwAbout
 '           CodeHelp Core IDE Extender Framework 2.2 & Rubberduck 2.4.1
 '
 '           MZ-TOOLS https://www.mztools.com/
-'           CodeHelp http://www.planetsourcecode.com/vb/scripts/ShowCode.asp?txtCodeId=62468&lngWId=1
+'           CodeHelp http://www.magnifiersourcecode.com/vb/scripts/ShowCode.asp?txtCodeId=62468&lngWId=1
 '           Rubberduck http://rubberduckvba.com/
 '           Registry code ALLAPI.COM
 '           VbAdvance
-'           La Volpe  http://www.planet-source-code.com/vb/scripts/ShowCode.asp?txtCodeId=67466&lngWId=1
+'           La Volpe  http://www.magnifier-source-code.com/vb/scripts/ShowCode.asp?txtCodeId=67466&lngWId=1
 '           Open File common dialog code without dependent OCX - http://forums.codeguru.com/member.php?92278-rxbagain
 '           Open font dialog code without dependent OCX - unknown URL
 '           Krool's replacement Controls http://www.vbforums.com/showthread.php?698563-CommonControls-%28Replacement-of-the-MS-common-controls%29
@@ -70,8 +70,8 @@ Public aboutWidget As cwAbout
 '
 ' Dependencies:
 '
-'           Requires a planet folder in C:\Users\<user>\AppData\Roaming\ eg: C:\Users\<user>\AppData\Roaming\planet
-'           Requires a settings.ini file to exist in C:\Users\<user>\AppData\Roaming\planet
+'           Requires a magnifier folder in C:\Users\<user>\AppData\Roaming\ eg: C:\Users\<user>\AppData\Roaming\magnifier
+'           Requires a settings.ini file to exist in C:\Users\<user>\AppData\Roaming\magnifier
 '           The above will be created automatically by the compiled program when run for the first time.
 '
 '           Uses just one OCX control extracted from Krool's mega pack (slider). This is part of Krool's replacement for the
@@ -81,7 +81,7 @@ Public aboutWidget As cwAbout
 '           * CCRSlider.ocx
 '
 '           This OCX will reside in the program folder. The program reference to this OCX is contained within the
-'           supplied resource file planet.RES. It is compiled into the binary.
+'           supplied resource file magnifier.RES. It is compiled into the binary.
 '
 '           * OLEGuids.tlb
 '
@@ -110,7 +110,7 @@ Public aboutWidget As cwAbout
 '
 '           * SETUP.EXE - The program is currently distributed using setup2go, a very useful and comprehensive installer program
 '           that builds a .exe installer. You'll have to find a copy of setup2go on the web as it is now abandonware. Contact me
-'           directly for a copy. The file "install planet 0.1.0.s2g" is the configuration file for setup2go. When you build it will
+'           directly for a copy. The file "install magnifier 0.1.0.s2g" is the configuration file for setup2go. When you build it will
 '           report any errors in the build.
 '
 '           * HELP.CHM - the program documentation is built using the NVU HTML editor and compiled using the Microsoft supplied
@@ -133,7 +133,7 @@ Public aboutWidget As cwAbout
 '
 '           This program is a mix of native VB6 forms and controls and 3rd party additions.
 '           The superb RC5 Cairo wrapper from Olaf Schmidt is used in a very limited manner.
-'           RC5's transparency capability is used for the main planet and the about image only. I haven't used
+'           RC5's transparency capability is used for the main magnifier and the about image only. I haven't used
 '           Olaf's other Cairo controls to build forms as I need a graphical IDE to operate. Only testing RC5
 '           at the moment, there should be no problems upgrading to RC6.
 '
@@ -160,7 +160,7 @@ Public aboutWidget As cwAbout
 '           intervals. I could have done with GDI+ using multiple embedded icons but it is OK for the moment. All in all,
 '           it's a bit sh1t but it works well enough, so it'll do...
 '
-'           There is one useful .BAT file - unhide.bat which will reveal a planet planet mistakenly 'hidden' for an
+'           There is one useful .BAT file - unhide.bat which will reveal a magnifier magnifier mistakenly 'hidden' for an
 '           extended period of time from the right click menu. This will allow you to open the prefs and unset the hidden
 '           configuration option.
 '
@@ -251,7 +251,7 @@ Public Sub mainRoutine(ByVal restart As Boolean)
     Call getToolSettingsFile
     
     ' read the dock settings from the new configuration file
-    Call readSettingsFile(softwarePlanet, gblPlSettingsFile)
+    Call readSettingsFile(softwareMagnifier, gblPlSettingsFile)
         
     ' check first usage and display licence screen
     Call checkLicenceState
@@ -289,7 +289,7 @@ Public Sub mainRoutine(ByVal restart As Boolean)
     Call configureTimers
     
     'load the preferences form but don't yet show it, speeds up access to the prefs via the menu
-    Load planetPrefs
+    Load magnifierPrefs
 
     ' RC message pump will auto-exit when Cairo Forms = 0 so we run it only when 0, this prevents message interruption
     ' when running twice on reload.
@@ -318,7 +318,7 @@ Private Sub checkFirstTime()
 
     If gblPlFirstTimeRun = "true" Then
         gblPlFirstTimeRun = "false"
-        sPutINISetting softwarePlanet, "firstTimeRun", gblPlFirstTimeRun, gblPlSettingsFile
+        sPutINISetting softwareMagnifier, "firstTimeRun", gblPlFirstTimeRun, gblPlSettingsFile
     End If
 
    On Error GoTo 0
@@ -341,8 +341,8 @@ Private Sub initialiseGlobalVars()
       
     On Error GoTo initialiseGlobalVars_Error
 
-    thisPlanet = "\Magnifier"
-    softwarePlanet = "Software" & thisPlanet
+    thisMagnifier = "\Magnifier"
+    softwareMagnifier = "Software" & thisMagnifier
 
     ' general
     gblPlStartup = vbNullString
@@ -453,7 +453,7 @@ Private Sub addImagesToImageList()
     Cairo.ImageList.AddImage "about", App.Path & "\Resources\images\about.png"
     
     'add Resources to the global ImageList
-    Cairo.ImageList.AddImage "planet", App.Path & "\Resources\images\Magnifier.png"
+    Cairo.ImageList.AddImage "magnifier", App.Path & "\Resources\images\Magnifier.png"
 
    On Error GoTo 0
    Exit Sub
@@ -467,7 +467,7 @@ End Sub
 ' Procedure : adjustMainControls
 ' Author    : beededea
 ' Date      : 27/04/2023
-' Purpose   : called at runtime and on restart, sets the characteristics of the planet and menus
+' Purpose   : called at runtime and on restart, sets the characteristics of the magnifier and menus
 '---------------------------------------------------------------------------------------
 '
 Public Sub adjustMainControls()
@@ -477,21 +477,20 @@ Public Sub adjustMainControls()
     ' validate the inputs of any data from the input settings file
     Call validateInputs
     
-    'planetWidget.RotationSpeed = Val(gblPlanetSelection)
-    planetWidget.Zoom = Val(gblPlGaugeSize) / 100
-    planetWidget.ZoomDirection = gblPlScrollWheelDirection
+    magnifierWidget.Zoom = Val(gblPlGaugeSize) / 100
+    magnifierWidget.ZoomDirection = gblPlScrollWheelDirection
     
-    If planetWidget.Hidden = False Then
-        planetWidget.opacity = Val(gblPlOpacity) / 100
-        planetWidget.Widget.Refresh
+    If magnifierWidget.Hidden = False Then
+        magnifierWidget.opacity = Val(gblPlOpacity) / 100
+        magnifierWidget.Widget.Refresh
     End If
     
     If gblPlGaugeFunctions = "1" Then
-        ' planetWidget.Rotating = True
+        ' magnifierWidget.Rotating = True
         menuForm.mnuSwitchOff.Checked = False
         menuForm.mnuTurnFunctionsOn.Checked = True
     Else
-        ' planetWidget.Rotating = False
+        ' magnifierWidget.Rotating = False
         menuForm.mnuSwitchOff.Checked = True
         menuForm.mnuTurnFunctionsOn.Checked = False
     End If
@@ -505,16 +504,16 @@ Public Sub adjustMainControls()
         
     If gblPlPreventDragging = "0" Then
         menuForm.mnuLockWidget.Checked = False
-        planetWidget.Locked = False
+        magnifierWidget.Locked = False
     Else
         menuForm.mnuLockWidget.Checked = True
-        planetWidget.Locked = True ' this is just here for continuity's sake, it is also set at the time the control is selected
+        magnifierWidget.Locked = True ' this is just here for continuity's sake, it is also set at the time the control is selected
     End If
     
     If gblPlShowTaskbar = "0" Then
-        fMain.planetForm.ShowInTaskbar = False
+        fMain.magnifierForm.ShowInTaskbar = False
     Else
-        fMain.planetForm.ShowInTaskbar = True
+        fMain.magnifierForm.ShowInTaskbar = True
     End If
                  
     ' set the z-ordering of the window
@@ -551,11 +550,11 @@ Public Sub setWindowZordering()
    On Error GoTo setWindowZordering_Error
 
     If Val(gblPlWindowLevel) = 0 Then
-        Call SetWindowPos(fMain.planetForm.hwnd, HWND_BOTTOM, 0&, 0&, 0&, 0&, OnTopFlags)
+        Call SetWindowPos(fMain.magnifierForm.hwnd, HWND_BOTTOM, 0&, 0&, 0&, 0&, OnTopFlags)
     ElseIf Val(gblPlWindowLevel) = 1 Then
-        Call SetWindowPos(fMain.planetForm.hwnd, HWND_TOP, 0&, 0&, 0&, 0&, OnTopFlags)
+        Call SetWindowPos(fMain.magnifierForm.hwnd, HWND_TOP, 0&, 0&, 0&, 0&, OnTopFlags)
     ElseIf Val(gblPlWindowLevel) = 2 Then
-        Call SetWindowPos(fMain.planetForm.hwnd, HWND_TOPMOST, 0&, 0&, 0&, 0&, OnTopFlags)
+        Call SetWindowPos(fMain.magnifierForm.hwnd, HWND_TOPMOST, 0&, 0&, 0&, 0&, OnTopFlags)
     End If
 
    On Error GoTo 0
@@ -581,7 +580,6 @@ Public Sub readSettingsFile(ByVal location As String, ByVal gblPlSettingsFile As
         ' general
         gblPlStartup = fGetINISetting(location, "startup", gblPlSettingsFile)
         gblPlGaugeFunctions = fGetINISetting(location, "gaugeFunctions", gblPlSettingsFile)
-        gblPlanetSelection = fGetINISetting(location, "planetSelection", gblPlSettingsFile)
         
         ' configuration
         gblPlEnableTooltips = fGetINISetting(location, "enableTooltips", gblPlSettingsFile)
@@ -620,8 +618,8 @@ Public Sub readSettingsFile(ByVal location As String, ByVal gblPlSettingsFile As
         gblPlDefaultEditor = fGetINISetting(location, "defaultEditor", gblPlSettingsFile)
         
         ' other
-        gblPlMaximiseFormX = fGetINISetting(softwarePlanet, "maximiseFormX", gblPlSettingsFile)
-        gblPlMaximiseFormY = fGetINISetting(softwarePlanet, "maximiseFormY", gblPlSettingsFile)
+        gblPlMaximiseFormX = fGetINISetting(softwareMagnifier, "maximiseFormX", gblPlSettingsFile)
+        gblPlMaximiseFormY = fGetINISetting(softwareMagnifier, "maximiseFormY", gblPlSettingsFile)
         gblPlLastSelectedTab = fGetINISetting(location, "lastSelectedTab", gblPlSettingsFile)
         gblPlSkinTheme = fGetINISetting(location, "skinTheme", gblPlSettingsFile)
         
@@ -665,7 +663,6 @@ Public Sub validateInputs()
             
         ' general
         If gblPlGaugeFunctions = vbNullString Then gblPlGaugeFunctions = "1" ' always operate
-        If gblPlanetSelection = vbNullString Then gblPlanetSelection = "0"
         If gblPlStartup = vbNullString Then gblPlStartup = "1"
         
         ' Config
@@ -737,7 +734,7 @@ Private Sub getToolSettingsFile()
     
     Dim iFileNo As Integer: iFileNo = 0
     
-    gblPlSettingsDir = fSpecialFolder(feUserAppData) & thisPlanet ' just for this user alone
+    gblPlSettingsDir = fSpecialFolder(feUserAppData) & thisMagnifier ' just for this user alone
     gblPlSettingsFile = gblPlSettingsDir & "\settings.ini"
         
     'if the folder does not exist then create the folder
@@ -842,7 +839,7 @@ Private Sub createFormOnCurrentDisplay()
     On Error GoTo createFormOnCurrentDisplay_Error
 
     With New_c.Displays(1) 'get the current Display
-      fMain.InitAndShowAsFreeForm .WorkLeft, .WorkTop, 1000, 1000, "planet Widget"
+      fMain.InitAndShowAsFreeForm .WorkLeft, .WorkTop, 1000, 1000, "magnifier Widget"
     End With
 
     On Error GoTo 0
@@ -873,8 +870,8 @@ Private Sub handleUnhideMode(ByVal thisUnhideMode As String)
 
     If thisUnhideMode = "unhide" Then     'parse the command line
         gblPlUnhide = "true"
-        sPutINISetting softwarePlanet, "unhide", gblPlUnhide, gblPlSettingsFile
-        Call planetForm_Unload
+        sPutINISetting softwareMagnifier, "unhide", gblPlUnhide, gblPlSettingsFile
+        Call magnifierForm_Unload
         End
     End If
 
